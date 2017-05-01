@@ -7,7 +7,7 @@
     "build": "grunt",
     "start": "grunt start"
   },
-  "author": "Hannes Moser <hannes@impossiblearts.com>",
+  "author": "Dominik Bryant <dbryant.mmt-m2016@fh-salzburg.ac.at>",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.18.0",
@@ -31,5 +31,8 @@
     "socket.io-client": "^1.5.1",
     "time-grunt": "^1.2.1",
     "uglifyify": "^3.0.4"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7"
   }
 }

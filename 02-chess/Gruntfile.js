@@ -86,7 +86,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: './node_modules/chessboardjs/www/img',
             src: '**/*',
-            dest: './dist/images'
+            dest: './dist/img'
           },
           // html
           {
@@ -109,7 +109,7 @@ module.exports = function(grunt) {
         }
       },
       js: {
-        files: ['./src/**/*.js', './src/**/*.hbs'],
+        files: ['./src/**/*.js'],
         tasks: ['browserify:watch'],
         options: {
           livereload: true

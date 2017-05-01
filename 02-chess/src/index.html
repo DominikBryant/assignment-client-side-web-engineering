@@ -1,9 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/chessboard.css">
   </head>
   <body>
-    <h1>04-chess</h4>
+    <h1>02-chess</h4>
+    <div id="board1" style="width: 400px"></div>
+    <div id="history">
+      <h2>History</h2>
+      <ul></ul>
+      <div class="form-group game-control">
+        <button class="btn btn-default btn-undo">Undo</button>
+        <button class="btn btn-danger btn-restart">Restart</button>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="game-create">Create</button>
+
+    <script src="app.js"></script>
   </body>
 </html>
 
