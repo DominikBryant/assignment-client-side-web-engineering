@@ -1,7 +1,15 @@
 import PouchDB from 'pouchdb'
+import {
+  emptyItemQuery
+} from './item'
 
 const localDB = new PouchDB('mmt-ss2017')
-const remoteDB = new PouchDB('https://couchdb.5k20.com/mmt-ss2017')
+const remoteDB = new PouchDB('https://couchdb.5k20.com/mmt-ss2017', {
+    auth: {
+        username: 'dbryant',
+        password: 'test',
+    }
+})
 
 export default class Store {
     /**
@@ -13,6 +21,18 @@ export default class Store {
          * @type {ItemList}
          */
         let liveTodos
+        remoteDB
+            .sync(localDB, {
+                live: true,
+                retry: true
+            }).on('change', function (info) {
+              if (callback) {
+                  callback()
+              }
+            })
+            .on('error', err => {
+                console.error(`An error occured: ${err}`)
+            });
 
         /**
          * Read the local ItemList from localStorage.
@@ -20,14 +40,23 @@ export default class Store {
          * @returns {ItemList} Current array of todos
          */
         this.getStore = () => {
-        }
-
-        /**
-         * Write the local ItemList to localStorage.
-         *
-         * @param {ItemList} todos Array of todos to write
-         */
-        this.setStore = (todos) => {
+            return localDB.
+                allDocs({
+                   include_docs: true
+                }).then((todos) => {
+                    const converted_todos = todos.rows.map((row) => {
+                        return {
+                            id: row.doc.id,
+                            title: row.doc.title,
+                            completed: row.doc.completed,
+                            _rev: row.doc._rev,
+                        }
+                    })
+                    return converted_todos
+                })
+                .catch(function (err) {
+                  console.log(err);
+                });
         }
 
         if (callback) {
@@ -47,7 +76,17 @@ export default class Store {
 	 * })
      */
     find(query, callback) {
-
+        this.getStore().then((todos) => {
+            let k
+            callback(todos.filter(todo => {
+                for (k in query) {
+                    if (query[k] !== todo[k]) {
+                        return false
+                    }
+                }
+                return true
+            }))
+        })
     }
 
     /**
@@ -57,7 +96,17 @@ export default class Store {
      * @param {function()} [callback] Called when partialRecord is applied
      */
     update(update, callback) {
-
+        const id = update.id
+        localDB
+            .get(`${id}`)
+            .then((todo)=> {
+                localDB.put(Object.assign(todo, update))
+                .then(() => {
+                    if (callback) {
+                        callback()
+                    }
+                })
+            })
     }
 
     /**
@@ -67,7 +116,14 @@ export default class Store {
      * @param {function()} [callback] Called when item is inserted
      */
     insert(item, callback) {
-
+        item._id = `${item.id}`
+        localDB
+            .put(item)
+            .then(() => {
+                if (callback) {
+                    callback()
+                }
+            })
     }
 
     /**
@@ -77,7 +133,17 @@ export default class Store {
      * @param {function(ItemList)|function()} [callback] Called when records matching query are removed
      */
     remove(query, callback) {
-
+        localDB
+            .get(`${query.id}`)
+            .then((todo)=> {
+                console.log(todo)
+                localDB.put(Object.assign(todo, {_deleted: true}))
+                .then(() => {
+                    if (callback) {
+                        callback()
+                    }
+                })
+            })
     }
 
     /**
@@ -86,6 +152,16 @@ export default class Store {
      * @param {function(number, number, number)} callback Called when the count is completed
      */
     count(callback) {
+        this.find(emptyItemQuery, data => {
+            const total = data.length
 
+            let i = total
+            let completed = 0
+
+            while (i--) {
+                completed += data[i].completed
+            }
+            callback(total, total - completed, completed)
+        })
     }
 }

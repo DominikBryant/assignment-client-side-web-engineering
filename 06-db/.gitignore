@@ -1,3 +1,4 @@
+node_modules
 node_modules/.bin
 node_modules/babel-core
 node_modules/babel-preset-es2015
