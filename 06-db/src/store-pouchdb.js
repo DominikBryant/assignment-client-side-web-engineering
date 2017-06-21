@@ -46,7 +46,7 @@ export default class Store {
                 }).then((todos) => {
                     const converted_todos = todos.rows.map((row) => {
                         return {
-                            id: row.doc.id,
+                            id: row.id,
                             title: row.doc.title,
                             completed: row.doc.completed,
                             _rev: row.doc._rev,
